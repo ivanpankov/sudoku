@@ -18,8 +18,6 @@ export class HomePage implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.sugoku.getBoard('random').subscribe((data) => {
-      console.log(data);
-    });
+    this.sugoku.getBoard('random');
   }
 }
