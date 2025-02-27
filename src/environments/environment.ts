@@ -3,8 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
 };
+
+export const SUGOKU_URL = 'https://sugoku.onrender.com';
 
 /*
  * For easier debugging in development mode, you can import the following file
