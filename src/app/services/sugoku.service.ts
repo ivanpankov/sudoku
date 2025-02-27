@@ -24,8 +24,7 @@ function clearBoard() {
 export class SugokuService {
   readonly SUGOKU_URL = SUGOKU_URL;
   private readonly http = inject(HttpClient);
-  private readonly errorHandler = inject(ErrorHandlerService);
-  error = signal('');
+  readonly errorHandler = inject(ErrorHandlerService);
   board = signal(clearBoard());
   boardStatus: WritableSignal<BoardStatus> = signal('unsolved');
   difficulty: WritableSignal<Difficulty | ''> = signal('');
@@ -49,9 +48,9 @@ export class SugokuService {
     });
   }
 
-  validateBoard(board: Board) {
+  validateBoard() {
     const url = new URL('/validate', this.SUGOKU_URL);
-    const payload = { board };
+    const payload = { board: this.board() };
 
     this.errorHandler.clearMessage();
     const that = this;
@@ -66,9 +65,9 @@ export class SugokuService {
     });
   }
 
-  solveBoard(board: Board) {
+  solveBoard() {
     const url = new URL('/solve', this.SUGOKU_URL);
-    const payload = { board };
+    const payload = { board: this.board() };
 
     this.errorHandler.clearMessage();
     const that = this;

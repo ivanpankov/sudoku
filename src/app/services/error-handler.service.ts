@@ -5,6 +5,7 @@ import { LogServiceService } from './log-service.service';
 
 export const HTTP_ERROR_404_MESSAGE = 'The resource is not found.';
 export const HTTP_ERROR_500_MESSAGE = 'Something went wrong.';
+export const NETWORK_ERROR_MESSAGE = 'Network Error';
 
 @Injectable({
   providedIn: 'root',
@@ -28,11 +29,12 @@ export class ErrorHandlerService implements ErrorHandler {
         this.errorMessage.set(HTTP_ERROR_404_MESSAGE);
         break;
 
-      case 500:
-        this.errorMessage.set(HTTP_ERROR_500_MESSAGE);
+      case 0:
+        this.errorMessage.set(NETWORK_ERROR_MESSAGE);
         break;
 
       default:
+        this.errorMessage.set(HTTP_ERROR_500_MESSAGE);
         break;
     }
   }

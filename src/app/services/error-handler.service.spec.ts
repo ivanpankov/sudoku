@@ -4,6 +4,7 @@ import {
   ErrorHandlerService,
   HTTP_ERROR_404_MESSAGE,
   HTTP_ERROR_500_MESSAGE,
+  NETWORK_ERROR_MESSAGE,
 } from './error-handler.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -39,7 +40,14 @@ describe('ErrorHandlerService', () => {
     expect(service.errorMessage()).toBe(HTTP_ERROR_500_MESSAGE);
   });
 
-  it('should handle HTTP Error code 500', () => {
+  it('should handle network error', () => {
+    const error = new HttpErrorResponse({ status: 0 });
+    service.handle(error);
+    expect(httpHandlerSpy).toHaveBeenCalledWith(error);
+    expect(service.errorMessage()).toBe(NETWORK_ERROR_MESSAGE);
+  });
+
+  it('should handle client error', () => {
     const TEST_MESSAGE = 'Test Message';
     const error = new Error(TEST_MESSAGE);
     service.handle(error);
