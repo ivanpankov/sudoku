@@ -44,7 +44,7 @@ export class SugokuService {
         that.board.set(response.board);
       },
       error(error) {
-        that.errorHandler.handleError(error);
+        that.errorHandler.handle(error);
       },
     });
   }
@@ -61,7 +61,7 @@ export class SugokuService {
         that.boardStatus.set(response.status);
       },
       error(error) {
-        that.errorHandler.handleError(error);
+        that.errorHandler.handle(error);
       },
     });
   }
@@ -80,7 +80,7 @@ export class SugokuService {
         that.board.set(response.solution);
       },
       error(error) {
-        that.errorHandler.handleError(error);
+        that.errorHandler.handle(error);
       },
     });
   }

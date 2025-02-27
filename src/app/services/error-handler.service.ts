@@ -1,20 +1,25 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { ErrorHandler } from '@angular/core';
+import { LogServiceService } from './log-service.service';
 
-const HTTP_ERROR_404_MESSAGE = 'The resource is not found.';
-const HTTP_ERROR_500_MESSAGE = 'Something went wrong.';
-const CLIENT_ERROR_MESSAGE = 'An error occurred.';
+export const HTTP_ERROR_404_MESSAGE = 'The resource is not found.';
+export const HTTP_ERROR_500_MESSAGE = 'Something went wrong.';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ErrorHandlerService implements ErrorHandler {
+  logger = inject(LogServiceService);
   errorMessage = signal('');
-  handleError(error: any): void {
+  handle(error: any): void {
     if (error instanceof HttpErrorResponse) {
       this.handleHttpError(error);
+    } else {
+      this.handleClientError(error);
     }
+
+    this.logger.log(error);
   }
 
   handleHttpError(resp: HttpErrorResponse) {
@@ -33,8 +38,7 @@ export class ErrorHandlerService implements ErrorHandler {
   }
 
   handleClientError(error: any) {
-    console.error(error.stack);
-    this.errorMessage.set(CLIENT_ERROR_MESSAGE);
+    this.errorMessage.set(error.message);
   }
 
   clearMessage() {
