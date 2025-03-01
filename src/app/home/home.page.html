@@ -13,14 +13,15 @@
 
   <div id="container">
     <div id="sudoku-board">
-      @for(item of items(); track item.key){
+      @for(item of sugoku.grid(); track item.key; let index = $index){
       <input
         type="text"
         maxlength="1"
         appDigitOnly
-        value="{{item.num}}"
+        value="{{item.num || ''}}"
         class="number-cell col{{item.col}} row{{item.row}}"
-        (input)="updateBoard($event, item.row, item.col)"
+        (input)="updateBoard($event, index)"
+        [disabled]="item.disabled"
       />
       }
     </div>

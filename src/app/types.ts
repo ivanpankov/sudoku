@@ -4,6 +4,16 @@ export type SolveStatus = 'solved' | 'broken' | 'unsolvable';
 export type Board = Array<Array<number>>;
 export type BoardStatus = ValidateStatus | SolveStatus;
 
+export type GridCell = {
+  num: number;
+  row: number;
+  col: number;
+  key: string;
+  disabled: boolean;
+};
+
+export type Grid = GridCell[];
+
 export type BoardResponse = {
   board: Board;
 };
