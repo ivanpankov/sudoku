@@ -6,15 +6,13 @@ import {
   BoardStatus,
   Difficulty,
   SolveResponse,
-  SolveStatus,
   ValidateResponse,
-  ValidateStatus,
 } from '../types';
 import { SUGOKU_URL } from '../../environments/environment';
 import { ErrorHandlerService } from './error-handler.service';
 
-function clearBoard() {
-  const row = new Array(9).fill(null);
+function clearBoard(): Board {
+  const row = new Array(9).fill(0);
   return new Array(9).fill([...row]);
 }
 
@@ -81,6 +79,30 @@ export class SugokuService {
       error(error) {
         that.errorHandler.handle(error);
       },
+    });
+  }
+
+  setCell(row: number, col: number, num: number) {
+    this.board.update((board) => {
+      const targetRow = board[row];
+      const targetItem = targetRow[col];
+
+      if (targetItem === num) {
+        return board;
+      }
+
+      const newRow = [
+        ...targetRow.slice(0, col),
+        num,
+        ...targetRow.slice(col + 1),
+      ];
+      const newBoard = [
+        ...board.slice(0, row),
+        newRow,
+        ...board.slice(row + 1),
+      ];
+
+      return newBoard;
     });
   }
 }

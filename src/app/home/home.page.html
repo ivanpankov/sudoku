@@ -12,15 +12,17 @@
   </ion-header>
 
   <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>
-      Start with Ionic
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://ionicframework.com/docs/components"
-        >UI Components</a
-      >
-    </p>
+    <div id="sudoku-board">
+      @for(item of items(); track item.key){
+      <input
+        type="text"
+        maxlength="1"
+        appDigitOnly
+        value="{{item.num}}"
+        class="number-cell col{{item.col}} row{{item.row}}"
+        (input)="updateBoard($event, item.row, item.col)"
+      />
+      }
+    </div>
   </div>
 </ion-content>
