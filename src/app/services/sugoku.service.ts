@@ -75,23 +75,7 @@ export class SugokuService {
 
     return this.http.get<BoardResponse>(url.toString()).subscribe({
       next(response) {
-        const { board } = response;
-        const grid: Grid = [];
-
-        for (let row = 0; row < ROWS_COUNT; row += 1) {
-          for (let col = 0; col < COLS_COUNT; col += 1) {
-            const num = board[row][col];
-            grid.push({
-              num,
-              row,
-              col,
-              key: `${row}${col}`,
-              disabled: num !== 0,
-            });
-          }
-        }
-
-        that.grid.set(grid);
+        that.grid.set(mapBoardToGrid(response.board));
       },
       error(error) {
         that.errorHandler.handle(error);
@@ -127,23 +111,7 @@ export class SugokuService {
       next(response) {
         that.boardStatus.set(response.status);
         that.difficulty.set(response.difficulty);
-
-        const board = response.solution;
-        const grid: Grid = [];
-
-        for (let row = 0; row < ROWS_COUNT; row += 1) {
-          for (let col = 0; col < COLS_COUNT; col += 1) {
-            const num = board[row][col];
-            grid.push({
-              num,
-              row,
-              col,
-              key: `${row}${col}`,
-              disabled: true,
-            });
-          }
-        }
-        that.grid.set(grid);
+        that.grid.set(mapBoardToGrid(response.solution));
       },
       error(error) {
         that.errorHandler.handle(error);

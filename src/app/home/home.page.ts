@@ -20,7 +20,7 @@ export class HomePage implements OnInit {
 
   ngOnInit(): void {
     setTimeout(() => {
-      // this.sugoku.getBoard('random');
+      this.sugoku.getBoard('random');
     }, 3000);
   }
 
