@@ -25,5 +25,27 @@
       />
       }
     </div>
+
+    <div>
+      <ion-button (click)="sugoku.getBoard('easy')" size="small"
+        >Easy</ion-button
+      >
+      <ion-button (click)="sugoku.getBoard('medium')" size="small"
+        >Medium</ion-button
+      >
+      <ion-button (click)="sugoku.getBoard('hard')" size="small"
+        >Hard</ion-button
+      >
+      <ion-button (click)="sugoku.getBoard('random')" size="small"
+        >Random</ion-button
+      >
+    </div>
+    <div>
+      <ion-button (click)="sugoku.solveBoard()" size="small">Solve</ion-button>
+      <ion-button (click)="sugoku.validateBoard()" size="small"
+        >Validate</ion-button
+      >
+      <ion-chip>Status: {{sugoku.boardStatus()}}</ion-chip>
+    </div>
   </div>
 </ion-content>
