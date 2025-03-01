@@ -5,13 +5,50 @@ import {
   BoardResponse,
   BoardStatus,
   Difficulty,
+  Grid,
   SolveResponse,
+  SudokuRequest,
   ValidateResponse,
 } from '../types';
 import { SUGOKU_URL } from '../../environments/environment';
 import { ErrorHandlerService } from './error-handler.service';
 
-function clearBoard(): Board {
+const ROWS_COUNT = 9;
+const COLS_COUNT = 9;
+
+export function mapBoardToGrid(board: number[][]): Grid {
+  const grid: Grid = [];
+
+  for (let row = 0; row < ROWS_COUNT; row += 1) {
+    for (let col = 0; col < COLS_COUNT; col += 1) {
+      const num = board[row][col];
+      grid.push({
+        num,
+        row,
+        col,
+        key: `${row}${col}`,
+        disabled: num !== 0,
+      });
+    }
+  }
+
+  return grid;
+}
+
+export function mapGridToBoard(grid: Grid): Board {
+  const board: Board = [];
+
+  for (let row = 0; row < ROWS_COUNT; row += 1) {
+    board.push([]);
+    for (let col = 0; col < COLS_COUNT; col += 1) {
+      board[row][col] = grid[row * COLS_COUNT + col].num;
+    }
+  }
+
+  return board;
+}
+
+export function getClearBoard(): Board {
   const row = new Array(9).fill(0);
   return new Array(9).fill([...row]);
 }
@@ -23,7 +60,7 @@ export class SugokuService {
   readonly SUGOKU_URL = SUGOKU_URL;
   private readonly http = inject(HttpClient);
   readonly errorHandler = inject(ErrorHandlerService);
-  board = signal(clearBoard());
+  grid = signal(mapBoardToGrid(getClearBoard()));
   boardStatus: WritableSignal<BoardStatus> = signal('unsolved');
   difficulty: WritableSignal<Difficulty | ''> = signal('');
 
@@ -38,7 +75,23 @@ export class SugokuService {
 
     return this.http.get<BoardResponse>(url.toString()).subscribe({
       next(response) {
-        that.board.set(response.board);
+        const { board } = response;
+        const grid: Grid = [];
+
+        for (let row = 0; row < ROWS_COUNT; row += 1) {
+          for (let col = 0; col < COLS_COUNT; col += 1) {
+            const num = board[row][col];
+            grid.push({
+              num,
+              row,
+              col,
+              key: `${row}${col}`,
+              disabled: num !== 0,
+            });
+          }
+        }
+
+        that.grid.set(grid);
       },
       error(error) {
         that.errorHandler.handle(error);
@@ -48,7 +101,7 @@ export class SugokuService {
 
   validateBoard() {
     const url = new URL('/validate', this.SUGOKU_URL);
-    const payload = { board: this.board() };
+    const payload: SudokuRequest = { board: mapGridToBoard(this.grid()) };
 
     this.errorHandler.clearMessage();
     const that = this;
@@ -65,7 +118,7 @@ export class SugokuService {
 
   solveBoard() {
     const url = new URL('/solve', this.SUGOKU_URL);
-    const payload = { board: this.board() };
+    const payload: SudokuRequest = { board: mapGridToBoard(this.grid()) };
 
     this.errorHandler.clearMessage();
     const that = this;
@@ -74,7 +127,23 @@ export class SugokuService {
       next(response) {
         that.boardStatus.set(response.status);
         that.difficulty.set(response.difficulty);
-        that.board.set(response.solution);
+
+        const board = response.solution;
+        const grid: Grid = [];
+
+        for (let row = 0; row < ROWS_COUNT; row += 1) {
+          for (let col = 0; col < COLS_COUNT; col += 1) {
+            const num = board[row][col];
+            grid.push({
+              num,
+              row,
+              col,
+              key: `${row}${col}`,
+              disabled: true,
+            });
+          }
+        }
+        that.grid.set(grid);
       },
       error(error) {
         that.errorHandler.handle(error);
@@ -82,27 +151,16 @@ export class SugokuService {
     });
   }
 
-  setCell(row: number, col: number, num: number) {
-    this.board.update((board) => {
-      const targetRow = board[row];
-      const targetItem = targetRow[col];
+  setCell(index: number, num: number) {
+    this.grid.update((grid: Grid) => {
+      const targetNum = grid[index].num;
 
-      if (targetItem === num) {
-        return board;
+      if (targetNum === num) {
+        return grid;
       }
 
-      const newRow = [
-        ...targetRow.slice(0, col),
-        num,
-        ...targetRow.slice(col + 1),
-      ];
-      const newBoard = [
-        ...board.slice(0, row),
-        newRow,
-        ...board.slice(row + 1),
-      ];
-
-      return newBoard;
+      const newCell = { ...grid[index], num };
+      return [...grid.slice(0, index), newCell, ...grid.slice(index + 1)];
     });
   }
 }

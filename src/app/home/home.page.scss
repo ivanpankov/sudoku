@@ -19,10 +19,14 @@
   height: 50px;
   font-size: 30px;
   text-align: center;
-  border: 1px solid #000;
+  border: 1px solid darkgray;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+.number-cell:disabled {
+  color: gray;
 }
 
 .row0 {
@@ -44,16 +48,4 @@
 }
 .row8 {
   border-bottom-width: 3px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .number-cell {
-    border-color: #fff;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  .number-cell {
-    border-color: #000;
-  }
 }

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { SugokuService } from './sugoku.service';
+import { mapBoardToGrid, SugokuService } from './sugoku.service';
 import { provideHttpClient } from '@angular/common/http';
 import {
   HttpTestingController,
@@ -81,14 +81,15 @@ describe('SugokuService', () => {
     expect(req.request.method).toEqual('GET');
     expect(req.request.url).toBe(url.toString());
 
-    expect(service.board()).toEqual(response.board);
+    expect(service.grid()).toEqual(mapBoardToGrid(response.board));
     expect(service.boardStatus()).toEqual('unsolved');
     expect(service.errorHandler.errorMessage()).toBe('');
   });
 
   it('should validate board', () => {
     const board = SOLVED_BOARD;
-    service.board.set(board);
+    const grid = mapBoardToGrid(board);
+    service.grid.set(grid);
     service.validateBoard();
     const url = new URL('/validate', service.SUGOKU_URL);
 
@@ -107,13 +108,14 @@ describe('SugokuService', () => {
     expect(req.request.body).toEqual({ board });
 
     expect(service.boardStatus()).toEqual(response.status);
-    expect(service.board()).toEqual(board);
+    expect(service.grid()).toEqual(grid);
     expect(service.errorHandler.errorMessage()).toBe('');
   });
 
   it('should solve board', () => {
     const board = UNSOLVED_BOARD;
-    service.board.set(board);
+    const grid = mapBoardToGrid(board);
+    service.grid.set(grid);
     service.solveBoard();
     const url = new URL('/solve', service.SUGOKU_URL);
 
@@ -136,7 +138,7 @@ describe('SugokuService', () => {
 
     expect(service.boardStatus()).toEqual(response.status);
     expect(service.difficulty()).toEqual(response.difficulty);
-    expect(service.board()).toEqual(response.solution);
+    expect(service.grid()).toEqual(grid);
     expect(service.errorHandler.errorMessage()).toBe('');
   });
 
@@ -170,5 +172,13 @@ describe('SugokuService', () => {
     req.error(new ProgressEvent('network error!'));
 
     expect(service.errorHandler.errorMessage()).toEqual(NETWORK_ERROR_MESSAGE);
+  });
+
+  xit('should map board to grid', () => {
+    // TODO:
+  });
+
+  xit('should map grid to board', () => {
+    // TODO:
   });
 });
