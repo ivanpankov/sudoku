@@ -8,6 +8,7 @@ import {
   IonChip,
   IonToolbar,
   IonLoading,
+  IonAlert,
 } from '@ionic/angular/standalone';
 import { SugokuService } from '../services/sugoku.service';
 import { DigitOnlyDirective } from '../digit-only.directive';
@@ -26,6 +27,7 @@ import { DigitOnlyDirective } from '../digit-only.directive';
     IonChip,
     IonToolbar,
     IonLoading,
+    IonAlert,
   ],
 })
 export class HomePage implements OnInit {

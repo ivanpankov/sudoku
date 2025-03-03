@@ -78,4 +78,12 @@
     [isOpen]="sugoku.isLoading()"
     [message]="sugoku.loadingMessage()"
   ></ion-loading>
+  <ion-alert
+    [isOpen]="sugoku.errorHandler.hasError()"
+    [header]="sugoku.errorHandler.ERROR_HEADER"
+    [subHeader]="sugoku.errorHandler.statusText()"
+    [message]="sugoku.errorHandler.errorMessage()"
+    (didDismiss)="sugoku.errorHandler.clearMessage()"
+    [buttons]="['Dismiss']"
+  ></ion-alert>
 </ion-content>

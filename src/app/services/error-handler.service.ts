@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { ErrorHandler } from '@angular/core';
 import { LogServiceService } from './log-service.service';
 
@@ -13,6 +13,12 @@ export const NETWORK_ERROR_MESSAGE = 'Network Error';
 export class ErrorHandlerService implements ErrorHandler {
   logger = inject(LogServiceService);
   errorMessage = signal('');
+  status = signal('');
+  hasError = computed(() => Boolean(this.errorMessage()));
+  readonly ERROR_HEADER = 'Error!';
+  statusText = computed(() =>
+    this.status() ? `Status: ${this.status()}` : ''
+  );
   handle(error: any): void {
     if (error instanceof HttpErrorResponse) {
       this.handleHttpError(error);
@@ -27,6 +33,7 @@ export class ErrorHandlerService implements ErrorHandler {
     switch (resp.status) {
       case 404:
         this.errorMessage.set(HTTP_ERROR_404_MESSAGE);
+        this.status.set('404');
         break;
 
       case 0:

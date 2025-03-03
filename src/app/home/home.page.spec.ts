@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HomePage } from './home.page';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { LOADING_BOARD_MESSAGE } from '../services/sugoku.service';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HTTP_ERROR_404_MESSAGE } from '../services/error-handler.service';
 
 describe('HomePage', () => {
   let component: HomePage;
@@ -28,11 +29,9 @@ describe('HomePage', () => {
 
     const easyButton: HTMLButtonElement | null =
       pageElement.querySelector('#load-easy-board');
-    if (!easyButton) {
-      throw Error('The load-easy-board button was not found in page.');
-    }
+    expect(easyButton).toBeTruthy;
 
-    easyButton.click();
+    easyButton?.click();
 
     expect(component.sugoku.getBoard).toHaveBeenCalledWith('easy');
 
@@ -40,12 +39,11 @@ describe('HomePage', () => {
       fixture.detectChanges();
 
       const loadingEl = pageElement.querySelector('ion-loading');
-      if (!loadingEl) {
-        throw Error('Loading element was not found.');
-      }
-
-      expect(loadingEl.textContent).toContain(LOADING_BOARD_MESSAGE);
-      expect(loadingEl.getAttribute('ng-reflect-is-open')).toBe('true');
+      expect(loadingEl).toBeTruthy;
+      expect(loadingEl?.getAttribute('ng-reflect-message')).toBe(
+        LOADING_BOARD_MESSAGE
+      );
+      expect(loadingEl?.getAttribute('ng-reflect-is-open')).toBe('true');
     });
   }));
 
@@ -61,11 +59,67 @@ describe('HomePage', () => {
     // TODO:
   });
 
-  it('should verify board', () => {
+  xit('should verify board', () => {
     // TODO:
   });
 
-  it('should validate board', () => {
+  xit('should validate board', () => {
     // TODO:
+  });
+
+  it('should show client error', async () => {
+    const ERROR_MESSAGE = 'Something bad happened.';
+    component.sugoku.errorHandler.handle(new Error(ERROR_MESSAGE));
+    const pageElement: HTMLElement = fixture.nativeElement;
+    spyOn(component.sugoku.errorHandler, 'clearMessage').and.callThrough();
+
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const alertEl = pageElement.querySelector('ion-alert');
+    expect(alertEl).toBeTruthy;
+    expect(alertEl?.getAttribute('ng-reflect-is-open')).toBe('true');
+    expect(alertEl?.getAttribute('ng-reflect-header')).toBe(
+      component.sugoku.errorHandler.ERROR_HEADER
+    );
+    expect(alertEl?.getAttribute('ng-reflect-message')).toBe(ERROR_MESSAGE);
+
+    const dismissButton = alertEl?.querySelector('button');
+
+    expect(dismissButton).toBeTruthy;
+
+    dismissButton?.click();
+
+    expect(component.sugoku.errorHandler).toHaveBeenCalled;
+  });
+
+  it('should show network error', async () => {
+    component.sugoku.errorHandler.handle(
+      new HttpErrorResponse({ status: 404 })
+    );
+    const pageElement: HTMLElement = fixture.nativeElement;
+    spyOn(component.sugoku.errorHandler, 'clearMessage').and.callThrough();
+
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const alertEl = pageElement.querySelector('ion-alert');
+    expect(alertEl).toBeTruthy;
+    expect(alertEl?.getAttribute('ng-reflect-is-open')).toBe('true');
+    expect(alertEl?.getAttribute('ng-reflect-header')).toBe(
+      component.sugoku.errorHandler.ERROR_HEADER
+    );
+    expect(alertEl?.getAttribute('ng-reflect-message')).toBe(
+      HTTP_ERROR_404_MESSAGE
+    );
+    expect(alertEl?.getAttribute('ng-reflect-sub-header')).toBe('Status: 404');
+
+    const dismissButton = alertEl?.querySelector('button');
+
+    expect(dismissButton).toBeTruthy;
+
+    dismissButton?.click();
+
+    expect(component.sugoku.errorHandler).toHaveBeenCalled;
   });
 });
