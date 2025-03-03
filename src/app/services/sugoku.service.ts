@@ -13,8 +13,11 @@ import {
 import { SUGOKU_URL } from '../../environments/environment';
 import { ErrorHandlerService } from './error-handler.service';
 
-const ROWS_COUNT = 9;
-const COLS_COUNT = 9;
+export const ROWS_COUNT = 9;
+export const COLS_COUNT = 9;
+export const LOADING_BOARD_MESSAGE = 'Loading board...';
+export const SOLVING_BOARD_MESSAGE = 'Solving board...';
+export const VALIDATING_BOARD_MESSAGE = 'Validating board...';
 
 export function mapBoardToGrid(board: number[][]): Grid {
   const grid: Grid = [];
@@ -63,6 +66,8 @@ export class SugokuService {
   grid = signal(mapBoardToGrid(getClearBoard()));
   boardStatus: WritableSignal<BoardStatus> = signal('unsolved');
   difficulty: WritableSignal<Difficulty | ''> = signal('');
+  loadingMessage: WritableSignal<string> = signal('');
+  isLoading = signal(false);
 
   constructor() {}
 
@@ -73,12 +78,19 @@ export class SugokuService {
     this.errorHandler.clearMessage();
     const that = this;
 
+    this.isLoading.set(true);
+    this.loadingMessage.set(LOADING_BOARD_MESSAGE);
+
     return this.http.get<BoardResponse>(url.toString()).subscribe({
       next(response) {
         that.grid.set(mapBoardToGrid(response.board));
+        that.isLoading.set(false);
+        that.loadingMessage.set('');
       },
       error(error) {
         that.errorHandler.handle(error);
+        that.isLoading.set(false);
+        that.loadingMessage.set('');
       },
     });
   }
@@ -90,12 +102,19 @@ export class SugokuService {
     this.errorHandler.clearMessage();
     const that = this;
 
+    this.isLoading.set(true);
+    this.loadingMessage.set(VALIDATING_BOARD_MESSAGE);
+
     return this.http.post<ValidateResponse>(url.toString(), payload).subscribe({
       next(response) {
         that.boardStatus.set(response.status);
+        that.isLoading.set(false);
+        that.loadingMessage.set('');
       },
       error(error) {
         that.errorHandler.handle(error);
+        that.isLoading.set(false);
+        that.loadingMessage.set('');
       },
     });
   }
@@ -107,14 +126,21 @@ export class SugokuService {
     this.errorHandler.clearMessage();
     const that = this;
 
+    this.isLoading.set(true);
+    this.loadingMessage.set(SOLVING_BOARD_MESSAGE);
+
     return this.http.post<SolveResponse>(url.toString(), payload).subscribe({
       next(response) {
         that.boardStatus.set(response.status);
         that.difficulty.set(response.difficulty);
         that.grid.set(mapBoardToGrid(response.solution));
+        that.isLoading.set(false);
+        that.loadingMessage.set('');
       },
       error(error) {
         that.errorHandler.handle(error);
+        that.isLoading.set(false);
+        that.loadingMessage.set('');
       },
     });
   }

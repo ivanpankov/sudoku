@@ -7,6 +7,7 @@ import {
   IonLabel,
   IonChip,
   IonToolbar,
+  IonLoading,
 } from '@ionic/angular/standalone';
 import { SugokuService } from '../services/sugoku.service';
 import { DigitOnlyDirective } from '../digit-only.directive';
@@ -24,6 +25,7 @@ import { DigitOnlyDirective } from '../digit-only.directive';
     IonLabel,
     IonChip,
     IonToolbar,
+    IonLoading,
   ],
 })
 export class HomePage implements OnInit {
@@ -45,7 +47,5 @@ export class HomePage implements OnInit {
     }
 
     this.sugoku.setCell(index, num);
-
-    console.log(this.sugoku.grid());
   }
 }

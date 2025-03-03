@@ -1,5 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { mapBoardToGrid, SugokuService } from './sugoku.service';
+import {
+  LOADING_BOARD_MESSAGE,
+  mapBoardToGrid,
+  SOLVING_BOARD_MESSAGE,
+  SugokuService,
+  VALIDATING_BOARD_MESSAGE,
+} from './sugoku.service';
 import { provideHttpClient } from '@angular/common/http';
 import {
   HttpTestingController,
@@ -74,10 +80,16 @@ describe('SugokuService', () => {
       url: url.toString(),
     });
 
+    expect(service.isLoading()).toBe(true);
+    expect(service.loadingMessage()).toBe(LOADING_BOARD_MESSAGE);
+
     const response: BoardResponse = {
       board: UNSOLVED_BOARD,
     };
     req.flush(response);
+
+    expect(service.isLoading()).toBe(false);
+    expect(service.loadingMessage()).toBe('');
 
     expect(req.request.method).toEqual('GET');
     expect(req.request.url).toBe(url.toString());
@@ -87,7 +99,7 @@ describe('SugokuService', () => {
     expect(service.errorHandler.errorMessage()).toBe('');
   });
 
-  fit('should validate board', () => {
+  it('should validate board', () => {
     const board = SOLVED_BOARD;
     const grid = mapBoardToGrid(board);
     service.grid.set(grid);
@@ -99,10 +111,16 @@ describe('SugokuService', () => {
       url: url.toString(),
     });
 
+    expect(service.isLoading()).toBe(true);
+    expect(service.loadingMessage()).toBe(VALIDATING_BOARD_MESSAGE);
+
     const response: ValidateResponse = {
       status: 'solved',
     };
     req.flush(response);
+
+    expect(service.isLoading()).toBe(false);
+    expect(service.loadingMessage()).toBe('');
 
     expect(req.request.method).toEqual('POST');
     expect(req.request.url).toBe(url.toString());
@@ -125,13 +143,18 @@ describe('SugokuService', () => {
       url: url.toString(),
     });
 
+    expect(service.isLoading()).toBe(true);
+    expect(service.loadingMessage()).toBe(SOLVING_BOARD_MESSAGE);
+
     const response: SolveResponse = {
       solution: SOLVED_BOARD,
       status: 'solved',
       difficulty: 'easy',
     };
-
     req.flush(response);
+
+    expect(service.isLoading()).toBe(false);
+    expect(service.loadingMessage()).toBe('');
 
     expect(req.request.method).toEqual('POST');
     expect(req.request.url).toBe(url.toString());
@@ -139,7 +162,7 @@ describe('SugokuService', () => {
 
     expect(service.boardStatus()).toEqual(response.status);
     expect(service.difficulty()).toEqual(response.difficulty);
-    expect(service.grid()).toEqual(grid);
+    expect(service.grid()).toEqual(mapBoardToGrid(SOLVED_BOARD));
     expect(service.errorHandler.errorMessage()).toBe('');
   });
 
@@ -180,6 +203,10 @@ describe('SugokuService', () => {
   });
 
   xit('should map grid to board', () => {
+    // TODO:
+  });
+
+  xit('should update board', () => {
     // TODO:
   });
 });
